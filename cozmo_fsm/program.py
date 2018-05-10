@@ -7,11 +7,6 @@ import time
 import numpy
 import numpy as np
 import cv2
-try:
-    import matplotlib
-    import matplotlib.pyplot as plt
-except:
-    pass
 
 import cozmo
 
@@ -67,6 +62,7 @@ class StateMachineProgram(StateNode):
                  ):
         super().__init__()
         self.name = self.__class__.__name__.lower()
+        self.parent = None
         self.simple_cli_callback = simple_cli_callback
 
         if not hasattr(self.robot, 'erouter'):
