@@ -2,7 +2,11 @@
 The cozmo server module allows multiple cozmo robots, running simple_cli, to share a single world map. Cozmo Server has been designed to work with as many as 50 robots at once but has only been tested with two.
 ## Usage
 ### Server
-On any computer on your local network navigate to the `cozmo_fsm` directory. You can run ```python3 server.py``` to run thedefault server. The default server will expect at least 3 cameras to be connected to this computer (it will assume the first one is a webcam facing the user and not attempt to use it) and the origin to be marked by an aruco marker with id `2`. You can modify the first few lines of the code to change which aruco marker and cameras to use. By default the server listens on port 1800
+On any computer on your local network navigate to the `cozmo_fsm` directory. You can run ```python3 server.py``` to run thedefault server. The default server will expect at least 3 cameras to be connected to this computer (it will assume the first one is a webcam facing the user and not attempt to use it) and the origin to be marked by an aruco marker with id `2`. You can modify the first few lines of the code to change which aruco marker and cameras to use. 
+
+By default the server listens on port 1800 and assumes that the origin aruco marker is placed parallel (and directly on) the world coordinates and the robot aruco markers are placed parallel to the robot frame. The origin marker can be rotated by setting the aruco_offset parameter of the Server constructor. There currently is no way to rotate the robot aruco markers.
+
+
 
 The line ```perched_cameras = [1, 2]``` can be changed to ```perched_cameras = [0, 1]``` to use the first 2 cameras or to ```perched_cameras = [1]``` to just use a single camera.  Other more advanced customizations can be made by adding parameters to the constructors; additional details can be found in the comments.
 
@@ -25,4 +29,10 @@ The fusion process also gets the landmarks from individual robots (lightcubes an
 * Perched cameras have too many false positive aruco markers. These are suppressed in ```client_handler.py```
 * When a robot sees a wall it can get stuck in its current rotation. (It won't turn on the worldmap regardless of its pose in the real world)
 * The transformation between the origin and robots is unreliable and robots can block the view of cameras. This can potentially be solved or alleviated by elevating the origin marker.
-* On the client, pickle causes an import issue when cozmo_server is not in your python_path. This is solved by adding cozmo_server to path or running simple_cli from within the cozmo_fsm folder.
+* On the client, pickle causes an import issue when cozmo_server is not in the python_path. This is solved by adding cozmo_server to path or running simple_cli from within the cozmo_fsm folder.
+* In the current setup in REL the blue camera (the one with cyan tape on) can be poorly calibrated and significantly less accurate than the pink camera.
+* Clients crash on server exit
+## Notes
+* Having more than one camera adds to constant visibility but does not increase stability due to the lack of a functioning particle filter.
+* Due to the placement of aruco markers on the robots (off angle and center) the perceived robot coordinates are often different than the real ones.
+* Since lift and head pose are not passed to server, shared worldmaps show the local robot pose (default on server) rather than the actual head and lift positions.
